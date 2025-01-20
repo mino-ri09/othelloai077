@@ -1,4 +1,4 @@
-from kogi_canvas import play_othello, PandaAI
+from kogi_canvas import play_othello, minoriAI
 import math
 import random
 
