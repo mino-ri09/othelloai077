@@ -11,13 +11,13 @@ class Board:
             self.board = [row[:] for row in board]
         else:
             self.board = [
-        [0,0,0,0,0,0],
-        [0,0,0,0,0,0],
-        [0,0,1,2,0,0],
-        [0,0,2,1,0,0],
-        [0,0,0,0,0,0],
-        [0,0,0,0,0,0],
-]
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 2, 0, 0],
+                [0, 0, 2, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+            ]
 
     def clone(self):
         return Board(self.board)
@@ -27,7 +27,7 @@ class Board:
             return False
 
         opponent = 3 - stone
-        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1,  (1, 1)]
         self.board[y][x] = stone
 
         for dx, dy in directions:
@@ -68,8 +68,7 @@ class Board:
     def display(self):
         print("  " + " ".join(map(str, range(len(self.board[0])))))
         for y, row in enumerate(self.board):
-            print(f"{y} " + " ".join(str(cell) if cell != 0 else "." for cell in row))
-
+            print(f"{ " + " ".join(str(cell) if cell != 0 else "." for cell in row))
 
 def can_place_x_y(board, stone, x, y):
     if board[y][x] != 0:
@@ -91,7 +90,6 @@ def can_place_x_y(board, stone, x, y):
             return True
 
     return False
-
 
 class MCTSNode:
     def __init__(self, board, stone, parent=None):
@@ -142,7 +140,6 @@ class MCTSNode:
         if self.parent:
             self.parent.backpropagate(result)
 
-
 class PandaMCTS:
     def __init__(self, iterations=1000):
         self.iterations = iterations
@@ -170,28 +167,19 @@ class PandaMCTS:
 
 # Game loop
 board = Board()
-panda_ai = PandaMCTS(iterations=1000)
-current_player = BLACK
+panda_ai = PandaMCTS(iterations=1000)  # これはPandaMCTSを使ったAI
+current_player = BLACK  # 先攻は黒（プレイヤー）
 
 while not board.is_full():
     board.display()
     print(f"Current player: {'BLACK' if current_player == BLACK else 'WHITE'}")
 
-    if current_player == BLACK:
-        while True:
-            try:
-                x, y = map(int, input("Enter your move (x y): ").split())
-                if board.place_stone(current_player, x, y):
-                    break
-                else:
-                    print("Invalid move. Try again.")
-            except ValueError:
-                print("Invalid input. Enter two numbers separated by a space.")
-    else:
-        x, y = panda_ai.place(board.board, current_player)
-        board.place_stone(current_player, x, y)
-        print(f"AI places at ({x}, {y})")
+    # プレイヤーが黒の時もAIを使って手を打つ（手動入力部分をAIに変更）
+    x, y = panda_ai.place(board.board, current_player)  # AIが手を決める
+    board.place_stone(current_player, x, y)
+    print(f"AI ({'Black' if current_player == BLACK else 'White'}) places at ({x}, {y})")  # AIが手を打った場所を表示
 
+    # プレイヤー交代
     current_player = 3 - current_player
 
 board.display()
