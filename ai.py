@@ -27,7 +27,7 @@ class Board:
             return False
 
         opponent = 3 - stone
-        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1,  (1, 1)]
+        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         self.board[y][x] = stone
 
         for dx, dy in directions:
@@ -68,7 +68,7 @@ class Board:
     def display(self):
         print("  " + " ".join(map(str, range(len(self.board[0])))))
         for y, row in enumerate(self.board):
-            print(f"{ " + " ".join(str(cell) if cell != 0 else "." for cell in row))
+            print(f"{y} " + " ".join(str(cell) if cell != 0 else "." for cell in row))
 
 def can_place_x_y(board, stone, x, y):
     if board[y][x] != 0:
@@ -140,12 +140,12 @@ class MCTSNode:
         if self.parent:
             self.parent.backpropagate(result)
 
-class PandaMCTS:
+class MinoriAI:
     def __init__(self, iterations=1000):
         self.iterations = iterations
 
     def face(self):
-        return "🐼"
+        return "MinoriAI 🐼"
 
     def place(self, board, stone):
         root = MCTSNode(Board(board), stone)
@@ -165,29 +165,44 @@ class PandaMCTS:
         best_move = root.best_child(exploration_weight=0).move
         return best_move
 
-# Game loop
-board = Board()
-panda_ai = PandaMCTS(iterations=1000)  # これはPandaMCTSを使ったAI
-current_player = BLACK  # 先攻は黒（プレイヤー）
+# ゲームループ
+def play_game():
+    board = Board()
+    minori_ai = MinoriAI(iterations=1000)  # AIの初期化
+    current_player = BLACK  # 黒が先攻（プレイヤー）
 
-while not board.is_full():
+    while not board.is_full():
+        board.display()
+        print(f"Current player: {'BLACK' if current_player == BLACK else 'WHITE'}")
+
+        if current_player == BLACK:
+            # プレイヤーの入力
+            valid_moves = board.get_valid_moves(BLACK)
+            if not valid_moves:
+                print("No valid moves for Black!")
+                break
+            x, y = map(int, input("Enter your move (x y): ").split())
+            if (x, y) not in valid_moves:
+                print("Invalid move! Try again.")
+                continue
+            board.place_stone(BLACK, x, y)
+        else:
+            # AIの手
+            x, y = minori_ai.place(board.board, WHITE)
+            board.place_stone(WHITE, x, y)
+            print(f"AI (White) places at ({x}, {y})")
+
+        current_player = 3 - current_player  # プレイヤー交代
+
     board.display()
-    print(f"Current player: {'BLACK' if current_player == BLACK else 'WHITE'}")
+    black, white = board.count_stones()
+    print(f"Game over! Black: {black}, White: {white}")
+    if black > white:
+        print("Black wins!")
+    elif white > black:
+        print("White wins!")
+    else:
+        print("It's a tie!")
 
-    # プレイヤーが黒の時もAIを使って手を打つ（手動入力部分をAIに変更）
-    x, y = panda_ai.place(board.board, current_player)  # AIが手を決める
-    board.place_stone(current_player, x, y)
-    print(f"AI ({'Black' if current_player == BLACK else 'White'}) places at ({x}, {y})")  # AIが手を打った場所を表示
-
-    # プレイヤー交代
-    current_player = 3 - current_player
-
-board.display()
-black, white = board.count_stones()
-print(f"Game over! Black: {black}, White: {white}")
-if black > white:
-    print("Black wins!")
-elif white > black:
-    print("White wins!")
-else:
-    print("It's a tie!")
+# ゲーム開始
+play_game()
